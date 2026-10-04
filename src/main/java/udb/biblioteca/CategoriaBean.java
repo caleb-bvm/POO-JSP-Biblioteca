@@ -1,8 +1,11 @@
-package com.mycompany.poo.jsp.biblioteca.beans;
+package udb.biblioteca;
 
 import com.mycompany.poo.jsp.biblioteca.util.Conexion;
-import java.io.*;
-import java.sql.*;
+import java.io.Serializable;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 

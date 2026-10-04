@@ -1,14 +1,19 @@
-package com.mycompany.poo.jsp.biblioteca.beans;
+package udb.biblioteca;
 
 import com.mycompany.poo.jsp.biblioteca.util.Conexion;
-import java.io.*;
-import java.sql.*;
+import java.io.Serializable;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 
 /*
   JavaBean que representa la tabla libros de la base bibliotecaudb.
-  La relación con categorias se modela con un objeto CategoriaBean.
+  La relaciÃ³n con categorias se modela con un objeto CategoriaBean.
  */
 public class LibroBean implements Serializable {
 
@@ -65,7 +70,7 @@ public class LibroBean implements Serializable {
     }
 
     /*
-      Atajo hacia el id de la categoría. Permite que
+      Atajo hacia el id de la categorÃ­a. Permite que
       jsp:setProperty property="*" asigne el campo idCategoria del formulario.
      */
     public int getIdCategoria() {
@@ -76,7 +81,7 @@ public class LibroBean implements Serializable {
         categoria.setIdCategoria(idCategoria);
     }
 
-    /* Nombre de la categoría a la que pertenece el libro. */
+    /* Nombre de la categorÃ­a a la que pertenece el libro. */
     public String getNombreCategoria() {
         return categoria.getNombreCategoria();
     }
@@ -90,7 +95,7 @@ public class LibroBean implements Serializable {
     }
 
     /*
-      Consulta todos los libros junto con su categoría, ordenados por título.
+      Consulta todos los libros junto con su categorÃ­a, ordenados por tÃ­tulo.
       Cada elemento de la lista ya trae su CategoriaBean completo.
      */
     public List<LibroBean> getListaLibros() throws SQLException, ClassNotFoundException {
@@ -120,5 +125,21 @@ public class LibroBean implements Serializable {
             }
         }
         return libros;
+    }
+
+    /** Registra el libro y conserva su categoría para la confirmación JSP. */
+    public void registrar(Connection con) throws SQLException {
+        titulo = titulo == null ? "" : titulo.trim(); autor = autor == null ? "" : autor.trim(); isbn = isbn == null ? "" : isbn.trim();
+        if(titulo.isEmpty() || titulo.length()>150 || autor.isEmpty() || autor.length()>100 || isbn.length()>20 || getIdCategoria()<=0 || cantidadDisponible<0)
+            throw new IllegalArgumentException("Datos del libro no válidos");
+        try(PreparedStatement q=con.prepareStatement("INSERT INTO libros(titulo,autor,isbn,id_categoria,cantidad_disponible) VALUES(?,?,?,?,?)",Statement.RETURN_GENERATED_KEYS)) {
+            q.setString(1,titulo); q.setString(2,autor);
+            if(isbn.isEmpty()) q.setNull(3,Types.VARCHAR); else q.setString(3,isbn);
+            q.setInt(4,getIdCategoria()); q.setInt(5,cantidadDisponible); q.executeUpdate();
+            try(ResultSet r=q.getGeneratedKeys()) { if(r.next()) idLibro=r.getInt(1); }
+        }
+        try(PreparedStatement q=con.prepareStatement("SELECT nombre_categoria FROM categorias WHERE id_categoria=?")) {
+            q.setInt(1,getIdCategoria()); try(ResultSet r=q.executeQuery()) { if(r.next()) categoria.setNombreCategoria(r.getString(1)); }
+        }
     }
 }

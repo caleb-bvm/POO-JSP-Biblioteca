@@ -1,89 +1,28 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ page import="java.sql.PreparedStatement" %>
-<%@ page import="java.sql.ResultSet" %>
 <%@ page import="java.sql.SQLException" %>
-<%@ page import="java.sql.Statement" %>
-<%@ page import="java.sql.Types" %>
-<%-- conexion.jsp debe declarar una variable java.sql.Connection llamada conexion. --%>
-<%@ include file="conexion.jsp" %>
-<%!
-    /** Devuelve el texto sin espacios sobrantes; null se convierte en cadena vacía. */
-    private static String limpiar(String texto) {
-        return texto == null ? "" : texto.trim();
-    }
+<%-- La conexión compartida se incluye antes de ejecutar el Bean. --%>
+<% request.setCharacterEncoding("UTF-8");
+if (!"POST".equals(request.getMethod())) { response.sendError(405); return; }
+try { Integer.parseInt(request.getParameter("idCategoria")); } catch(Exception e) { response.sendError(400,"Valor numérico no válido"); return; }
+try { Integer.parseInt(request.getParameter("cantidadDisponible")); } catch(Exception e) { response.sendError(400,"Valor numérico no válido"); return; }
 %>
-<jsp:useBean id="libro" class="com.mycompany.poo.jsp.biblioteca.beans.LibroBean" scope="request" />
+<%@ include file="conexion.jsp" %>
+
+<jsp:useBean id="libro" class="udb.biblioteca.LibroBean" scope="request" />
 <jsp:setProperty name="libro" property="*" />
 <%
     String mensaje;
     boolean registrado = false;
-
-    // setProperty omite los campos vacíos, así que se normalizan antes de validar.
-    libro.setTitulo(limpiar(libro.getTitulo()));
-    libro.setAutor(limpiar(libro.getAutor()));
-    libro.setIsbn(limpiar(libro.getIsbn()));
-
-    try {
-        if (conexion == null) {
-            mensaje = "No se pudo conectar con la base de datos. Verifica que MySQL esté en ejecución.";
-        } else if (libro.getTitulo().isEmpty() || libro.getAutor().isEmpty() || libro.getIdCategoria() <= 0) {
-            mensaje = "Completa los campos obligatorios: título, autor y categoría.";
-        } else if (libro.getCantidadDisponible() < 0) {
-            mensaje = "La cantidad disponible no puede ser negativa.";
-        } else {
-            String sql = "INSERT INTO libros (titulo, autor, isbn, id_categoria, cantidad_disponible) "
-                    + "VALUES (?, ?, ?, ?, ?)";
-            try (PreparedStatement consulta = conexion.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-                consulta.setString(1, libro.getTitulo());
-                consulta.setString(2, libro.getAutor());
-                // El ISBN es UNIQUE: un ISBN vacío se guarda como NULL para no chocar con otros libros sin ISBN.
-                if (libro.getIsbn().isEmpty()) {
-                    consulta.setNull(3, Types.VARCHAR);
-                } else {
-                    consulta.setString(3, libro.getIsbn());
-                }
-                consulta.setInt(4, libro.getIdCategoria());
-                consulta.setInt(5, libro.getCantidadDisponible());
-                consulta.executeUpdate();
-
-                try (ResultSet ids = consulta.getGeneratedKeys()) {
-                    if (ids.next()) {
-                        libro.setIdLibro(ids.getInt(1));
-                    }
-                }
-            }
-
-            // Se carga el nombre de la categoría para mostrarlo en la confirmación.
-            try (PreparedStatement consultaCategoria = conexion.prepareStatement(
-                    "SELECT nombre_categoria FROM categorias WHERE id_categoria = ?")) {
-                consultaCategoria.setInt(1, libro.getIdCategoria());
-                try (ResultSet resultado = consultaCategoria.executeQuery()) {
-                    if (resultado.next()) {
-                        libro.getCategoria().setNombreCategoria(resultado.getString("nombre_categoria"));
-                    }
-                }
-            }
-
-            registrado = true;
-            mensaje = "Libro registrado correctamente.";
-        }
+    try (java.sql.Connection con = conexion) {
+        libro.registrar(con);
+        registrado = true;
+        mensaje = "Libro registrado correctamente.";
+    } catch (IllegalArgumentException e) {
+        mensaje = "Completa los campos obligatorios y revisa las longitudes de los datos.";
     } catch (SQLException e) {
-        if (e.getErrorCode() == 1062) { // Entrada duplicada (ISBN repetido)
-            mensaje = "Ya existe un libro con ese ISBN. Revisa el número o deja el campo vacío.";
-        } else if (e.getErrorCode() == 1452) { // Llave foránea inválida
-            mensaje = "La categoría seleccionada ya no existe. Vuelve al formulario y elige otra.";
-        } else {
-            mensaje = "No se pudo registrar el libro. Revisa los datos y que la base de datos esté disponible.";
-        }
-    } finally {
-        if (conexion != null) {
-            try {
-                conexion.close();
-            } catch (SQLException e) {
-                // La conexión ya no se utilizará en esta página.
-            }
-        }
+        mensaje = "No se pudo registrar. Revisa los datos duplicados y la conexión a MySQL.";
     }
+
 %>
 <!DOCTYPE html>
 <html lang="es">

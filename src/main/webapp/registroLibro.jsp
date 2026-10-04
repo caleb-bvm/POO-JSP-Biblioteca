@@ -1,12 +1,12 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-<%@ page import="com.mycompany.poo.jsp.biblioteca.beans.CategoriaBean" %>
-<%@ page import="com.mycompany.poo.jsp.biblioteca.beans.LibroBean" %>
+<%@ page import="udb.biblioteca.CategoriaBean" %>
+<%@ page import="udb.biblioteca.LibroBean" %>
 <%@ page import="java.sql.SQLException" %>
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="java.util.List" %>
 <%-- Los beans consultan la base de datos por sí mismos (ver util/Conexion.java). --%>
-<jsp:useBean id="categoriaBean" class="com.mycompany.poo.jsp.biblioteca.beans.CategoriaBean" scope="page" />
-<jsp:useBean id="libroBean" class="com.mycompany.poo.jsp.biblioteca.beans.LibroBean" scope="page" />
+<jsp:useBean id="categoriaBean" class="udb.biblioteca.CategoriaBean" scope="page" />
+<jsp:useBean id="libroBean" class="udb.biblioteca.LibroBean" scope="page" />
 <%
     List<CategoriaBean> categorias = new ArrayList<>();
     List<LibroBean> libros = new ArrayList<>();
