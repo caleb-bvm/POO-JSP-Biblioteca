@@ -2,6 +2,16 @@
 
 Revisión del 4 de octubre de 2026 sobre `Guia_de_ejercicios_JSP.pdf`.
 
+## Segunda verificación de la versión actual
+
+Se repitió la revisión después de la integración f24fc7e. Se confirmó un error HTTP 500 al compilar controllerPrestamo.jsp en Tomcat por las clases Date y PreparedStatement sin importar. Ese controlador también había eliminado las acciones JSP exigidas y trasladado la lógica de préstamo fuera del Bean. Se corrigió para delegar en PrestamoBean y usar useBean, setProperty con property="*" y getProperty.
+
+Se añadió nuevamente al menú el acceso al listado y las devoluciones, y se repararon comentarios con caracteres mal codificados. Se conservaron los demás cambios de diseño del menú. La versión corregida pasó una compilación limpia de Maven y las 18 pruebas funcionales completas en Tomcat 9.0.109 con MariaDB 10.4.32. Se comprobó adicionalmente el enlace al listado, las acciones JSP de los tres controladores y las convenciones de los cuatro Beans mediante reflexión Java. Los estados del préstamo se comprobaron para ayer, hoy, mañana y un préstamo devuelto.
+
+Se volvió a importar el SQL en la base aislada de prueba y se verificaron los tipos, claves, relaciones, valores por defecto y registros iniciales de cada tabla. El Word del repositorio se convirtió nuevamente con Microsoft Word, se confirmó que tiene dos páginas y se inspeccionaron ambas páginas sin encontrar problemas de distribución ni caracteres dañados. No fue necesario cambiar su contenido.
+
+El ZIP anterior no coincidía con tres páginas JSP ni con el pom.xml vigente. Se regeneró con el código corregido, el SQL y la documentación actuales, y se verificó la igualdad de sus archivos con los del proyecto. Las capturas y la defensa grupal continúan pendientes. La prueba se realizó con MariaDB de XAMPP; un servidor MySQL independiente sigue sin verificarse.
+
 ## Resultado
 
 Se completaron los requisitos de código y se aprobaron 18 comprobaciones funcionales. El documento explicativo tiene dos páginas. La entrega todavía requiere capturas de pantalla y la defensa grupal. El acceso del navegador al sitio local fue rechazado por permiso denegado; no se generaron capturas ficticias.
