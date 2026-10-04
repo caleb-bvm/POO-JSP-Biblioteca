@@ -13,7 +13,7 @@ import java.util.List;
 
 /*
   JavaBean que representa la tabla libros de la base bibliotecaudb.
-  La relaciÃ³n con categorias se modela con un objeto CategoriaBean.
+  La relación con categorias se modela con un objeto CategoriaBean.
  */
 public class LibroBean implements Serializable {
 
@@ -70,7 +70,7 @@ public class LibroBean implements Serializable {
     }
 
     /*
-      Atajo hacia el id de la categorÃ­a. Permite que
+      Atajo hacia el id de la categoría. Permite que
       jsp:setProperty property="*" asigne el campo idCategoria del formulario.
      */
     public int getIdCategoria() {
@@ -81,7 +81,7 @@ public class LibroBean implements Serializable {
         categoria.setIdCategoria(idCategoria);
     }
 
-    /* Nombre de la categorÃ­a a la que pertenece el libro. */
+    /* Nombre de la categoría a la que pertenece el libro. */
     public String getNombreCategoria() {
         return categoria.getNombreCategoria();
     }
@@ -95,7 +95,7 @@ public class LibroBean implements Serializable {
     }
 
     /*
-      Consulta todos los libros junto con su categorÃ­a, ordenados por tÃ­tulo.
+      Consulta todos los libros junto con su categoría, ordenados por título.
       Cada elemento de la lista ya trae su CategoriaBean completo.
      */
     public List<LibroBean> getListaLibros() throws SQLException, ClassNotFoundException {
