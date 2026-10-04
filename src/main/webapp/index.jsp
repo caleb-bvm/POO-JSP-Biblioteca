@@ -58,6 +58,10 @@
                            class="btn btn-primary">
                             Registrar préstamo
                         </a>
+                        <a href="listaPrestamos.jsp"
+                           class="btn btn-outline-primary mt-2">
+                            Listado y devoluciones
+                        </a>
                     </div>
                 </div>
             </div>
