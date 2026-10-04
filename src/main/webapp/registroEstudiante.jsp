@@ -12,7 +12,7 @@
         <h1 class="mb-4">Registro de estudiante</h1>
         <form action="controllerEstudiante.jsp" method="post" class="card card-body gap-3">
             <div>
-                <label for="carnet" class="form-label">Carné</label>
+                <label for="carnet" class="form-label">Carnet</label>
                 <input type="text" class="form-control" id="carnet" name="carnet" maxlength="10" required>
             </div>
             <div>
