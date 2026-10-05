@@ -7,7 +7,10 @@
 <%@ page import="java.util.List" %>
 <%-- conexion.jsp debe declarar una variable java.sql.Connection llamada conexion. --%>
 <%@ include file="conexion.jsp" %>
+<jsp:useBean id="prestamoBean" class="udb.biblioteca.PrestamoBean" scope="page" />
 <%
+    String hoy = prestamoBean.getFechaActual();
+    String fechaLimite = prestamoBean.getFechaLimiteDevolucion();
     List<String[]> estudiantes = new ArrayList<>();
     List<String[]> libros = new ArrayList<>();
     String errorConsulta = null;
@@ -78,11 +81,15 @@
                 </div>
                 <div>
                     <label for="fechaPrestamo" class="form-label">Fecha del préstamo</label>
-                    <input type="date" class="form-control" id="fechaPrestamo" name="fechaPrestamo" required>
+                    <input type="date" class="form-control" id="fechaPrestamo" name="fechaPrestamo"
+                           value="<%= hoy %>" readonly required>
+                    <div class="form-text">El préstamo se registra siempre con la fecha de hoy.</div>
                 </div>
                 <div>
                     <label for="fechaDevolucion" class="form-label">Fecha de devolución</label>
-                    <input type="date" class="form-control" id="fechaDevolucion" name="fechaDevolucion" required>
+                    <input type="date" class="form-control" id="fechaDevolucion" name="fechaDevolucion"
+                           value="<%= fechaLimite %>" min="<%= hoy %>" max="<%= fechaLimite %>" required>
+                    <div class="form-text">Plazo máximo de devolución: 14 días desde hoy.</div>
                 </div>
                 <button type="submit" class="btn btn-primary">Guardar préstamo</button>
             </form>

@@ -4,12 +4,16 @@ import com.mycompany.poo.jsp.biblioteca.util.Conexion;
 import java.io.Serializable;
 import java.sql.*;
 import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 
 /** Representa un préstamo y concentra las reglas de disponibilidad y devolución. */
 public class PrestamoBean implements Serializable {
     private static final long serialVersionUID = 1L;
+    private static final ZoneId ZONA = ZoneId.of("America/Guatemala");
+    private static final int PLAZO_DIAS = 14;
     private int idPrestamo;
     private LibroBean libro = new LibroBean();
     private EstudianteBean estudiante = new EstudianteBean();
@@ -33,16 +37,30 @@ public class PrestamoBean implements Serializable {
     public void setFechaDevolucion(String valor) { fechaDevolucion = valor; }
     public String getEstado() { return estado; }
     public void setEstado(String valor) { estado = valor; }
+    public String getFechaActual() { return LocalDate.now(ZONA).toString(); }
+    public String getFechaLimiteDevolucion() { return LocalDate.now(ZONA).plusDays(PLAZO_DIAS).toString(); }
     public String getEstadoPrestamo() {
         if ("Devuelto".equals(estado)) return "Devuelto";
-        return LocalDate.parse(fechaDevolucion).isBefore(LocalDate.now()) ? "Vencido" : "Vigente";
+        return LocalDate.parse(fechaDevolucion).isBefore(LocalDate.now(ZONA)) ? "Vencido" : "Vigente";
     }
     /** Actualización condicional y transacción impiden prestar la última copia dos veces. */
     public void registrar(Connection con) throws SQLException {
-        LocalDate inicio = LocalDate.parse(fechaPrestamo);
-        LocalDate fin = LocalDate.parse(fechaDevolucion);
-        if (getIdLibro() <= 0 || getIdEstudiante() <= 0 || fin.isBefore(inicio))
-            throw new IllegalArgumentException("Revisa el estudiante, libro y las fechas.");
+        // El servidor fija la fecha de registro aunque el formulario sea alterado.
+        LocalDate inicio = LocalDate.now(ZONA);
+        LocalDate limite = inicio.plusDays(PLAZO_DIAS);
+        fechaPrestamo = inicio.toString();
+        LocalDate fin;
+        try {
+            fin = fechaDevolucion == null || fechaDevolucion.isBlank()
+                    ? limite : LocalDate.parse(fechaDevolucion);
+        } catch (DateTimeParseException e) {
+            throw new IllegalArgumentException("Ingresa una fecha de devolución válida.");
+        }
+        if (getIdLibro() <= 0 || getIdEstudiante() <= 0)
+            throw new IllegalArgumentException("Selecciona un estudiante y un libro válidos.");
+        if (fin.isBefore(inicio) || fin.isAfter(limite))
+            throw new IllegalArgumentException("La devolución debe estar entre hoy y el " + limite + " (máximo 14 días).");
+        fechaDevolucion = fin.toString();
         con.setAutoCommit(false);
         try {
             try (PreparedStatement q = con.prepareStatement("UPDATE libros SET cantidad_disponible=cantidad_disponible-1 WHERE id_libro=? AND cantidad_disponible>0")) {

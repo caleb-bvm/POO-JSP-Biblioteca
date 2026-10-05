@@ -15,6 +15,8 @@ try { Integer.parseInt(request.getParameter("idEstudiante")); } catch(Exception 
     try (java.sql.Connection con = conexion) {
         prestamo.registrar(con);
         mensaje = "Préstamo registrado correctamente.";
+    } catch (IllegalArgumentException e) {
+        mensaje = e.getMessage();
     } catch (RuntimeException e) {
         mensaje = "Revisa los datos y las fechas. El libro debe tener ejemplares disponibles.";
     } catch (SQLException e) {
@@ -43,6 +45,7 @@ try { Integer.parseInt(request.getParameter("idEstudiante")); } catch(Exception 
                 </dl>
             <% } %>
             <a href="registroPrestamo.jsp" class="btn btn-primary align-self-start">Registrar otro préstamo</a>
+            <a href="index.jsp" class="btn btn-outline-secondary align-self-start mt-2">Volver al menú</a>
         </div>
     </main>
 </body>
