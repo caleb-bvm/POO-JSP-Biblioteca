@@ -1,4 +1,22 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page import="udb.biblioteca.EstudianteBean,java.util.List,java.util.ArrayList,java.sql.SQLException" %>
+<jsp:useBean id="estudianteBean" class="udb.biblioteca.EstudianteBean" scope="page" />
+<%!
+    // Los datos se muestran como texto, sin interpretar etiquetas HTML.
+    private String escapar(String texto) {
+        return texto == null ? "" : texto.replace("&", "&amp;").replace("<", "&lt;")
+                .replace(">", "&gt;").replace("\"", "&quot;").replace("'", "&#39;");
+    }
+%>
+<%
+    List<EstudianteBean> estudiantes = new ArrayList<>();
+    String errorConsulta = null;
+    try {
+        estudiantes = estudianteBean.getListaEstudiantes();
+    } catch (SQLException | ClassNotFoundException e) {
+        errorConsulta = "No se pudo cargar el listado de estudiantes. Revisa la conexión a la base de datos.";
+    }
+%>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -32,6 +50,31 @@
                 <a href="index.jsp" class="btn btn-outline-secondary">Volver</a>
             </div>
         </form>
+        <h2 class="h4 mt-5 mb-3">Estudiantes registrados</h2>
+        <% if (errorConsulta != null) { %>
+            <div class="alert alert-danger"><%= errorConsulta %></div>
+        <% } else if (estudiantes.isEmpty()) { %>
+            <p class="text-muted">Todavía no hay estudiantes registrados.</p>
+        <% } else { %>
+            <div class="table-responsive">
+                <table class="table table-sm table-striped align-middle">
+                    <thead>
+                        <tr><th>Carné</th><th>Nombre</th><th>Carrera</th><th>Teléfono</th></tr>
+                    </thead>
+                    <tbody>
+                        <% for (EstudianteBean estudiante : estudiantes) { %>
+                            <tr>
+                                <td><%= escapar(estudiante.getCarnet()) %></td>
+                                <td><%= escapar(estudiante.getNombreEstudiante()) %></td>
+                                <td><%= escapar(estudiante.getCarrera()) %></td>
+                                <td><%= estudiante.getTelefono() == null || estudiante.getTelefono().isBlank()
+                                        ? "Sin teléfono" : escapar(estudiante.getTelefono()) %></td>
+                            </tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+        <% } %>
     </main>
 </body>
 </html>

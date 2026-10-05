@@ -1,6 +1,13 @@
 package udb.biblioteca;
 
 import java.io.Serializable;
+import com.mycompany.poo.jsp.biblioteca.util.Conexion;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 /** JavaBean que representa la tabla estudiantes de la base bibliotecaudb. */
 public class EstudianteBean implements Serializable {
@@ -54,6 +61,27 @@ public class EstudianteBean implements Serializable {
 
     public void setTelefono(String telefono) {
         this.telefono = telefono;
+    }
+
+    /** Consulta los estudiantes para mostrar el listado debajo del formulario. */
+    public List<EstudianteBean> getListaEstudiantes() throws SQLException, ClassNotFoundException {
+        List<EstudianteBean> estudiantes = new ArrayList<>();
+        String sql = "SELECT id_estudiante, carnet, nombre_estudiante, carrera, telefono "
+                + "FROM estudiantes ORDER BY nombre_estudiante, carnet";
+        try (Connection con = Conexion.getConexion();
+             PreparedStatement consulta = con.prepareStatement(sql);
+             ResultSet resultado = consulta.executeQuery()) {
+            while (resultado.next()) {
+                EstudianteBean estudiante = new EstudianteBean();
+                estudiante.setIdEstudiante(resultado.getInt("id_estudiante"));
+                estudiante.setCarnet(resultado.getString("carnet"));
+                estudiante.setNombreEstudiante(resultado.getString("nombre_estudiante"));
+                estudiante.setCarrera(resultado.getString("carrera"));
+                estudiante.setTelefono(resultado.getString("telefono"));
+                estudiantes.add(estudiante);
+            }
+        }
+        return estudiantes;
     }
 
     /** Valida los campos y guarda el estudiante mediante una consulta parametrizada. */

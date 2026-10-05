@@ -56,6 +56,10 @@ La ejecución se comprobó en Apache Tomcat 9.0.109 con JDK 27 y clases compilad
 
 ## Evaluación
 
+### Listado adicional de estudiantes
+
+Se incorporó una tabla debajo del formulario de registro de estudiantes con carné, nombre, carrera y teléfono. EstudianteBean.getListaEstudiantes() consulta los registros mediante JDBC y los ordena por nombre y carné. La vista utiliza Bootstrap, muestra los textos escapados y contempla registros sin teléfono, una lista vacía y errores de consulta. Se verificaron la compilación Java y JSP, los registros existentes, la aparición de un estudiante recién registrado, los caracteres especiales, el teléfono opcional y los mensajes de lista vacía y error de consulta en Tomcat 9 con una base MariaDB aislada. Esta funcionalidad complementa la guía, aunque no es un requisito obligatorio.
+
 La rúbrica asigna 10 puntos a base de datos, 25 a JavaBeans, 20 a acciones JSP, 15 a formularios y vistas, 10 a JDBC, 10 a documentación y 10 a funcionalidades extra. El código ofrece evidencia para los criterios técnicos y las dos funcionalidades extra. La documentación requiere completar las capturas. La calificación definitiva depende del docente y de la defensa; esta revisión no garantiza 100 puntos.
 
 ## Pruebas aprobadas
