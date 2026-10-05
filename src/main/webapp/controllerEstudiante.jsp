@@ -43,6 +43,7 @@ if (!"POST".equals(request.getMethod())) { response.sendError(405); return; }
                 </dl>
             <% } %>
             <a href="registroEstudiante.jsp" class="btn btn-primary align-self-start">Registrar otro estudiante</a>
+            <a href="index.jsp" class="btn btn-outline-secondary align-self-start mt-2">Volver al menú</a>
         </div>
     </main>
 </body>

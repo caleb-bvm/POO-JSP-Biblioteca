@@ -54,6 +54,7 @@ try { Integer.parseInt(request.getParameter("cantidadDisponible")); } catch(Exce
                 </dl>
             <% } %>
             <a href="registroLibro.jsp" class="btn btn-primary align-self-start"><%= registrado ? "Registrar otro libro" : "Volver al formulario" %></a>
+            <a href="index.jsp" class="btn btn-outline-secondary align-self-start mt-2">Volver al menú</a>
         </div>
     </main>
 </body>
